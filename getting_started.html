@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Getting Started &#8212; Django Categories 1.8 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Using categories in templates" href="usage.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<p>You can use Django Categories in two ways:</p>
+<ol class="arabic">
+<li><p>As storage for one tree of categories, using the <a class="reference internal" href="reference/models.html#Category" title="Category"><code class="xref py py-class docutils literal notranslate"><span class="pre">Category</span></code></a> model:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Top</span> <span class="n">Category</span> <span class="mi">1</span>
+  <span class="n">Subcategory</span> <span class="mi">1</span><span class="o">-</span><span class="mi">1</span>
+    <span class="n">Subcategory</span> <span class="mi">1</span><span class="o">-</span><span class="mi">2</span>
+      <span class="n">subcategory</span> <span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span>
+<span class="n">Top</span> <span class="n">Category</span> <span class="mi">2</span>
+  <span class="n">Subcategory</span> <span class="mi">2</span><span class="o">-</span><span class="mi">1</span>
+</pre></div>
+</div>
+</li>
+<li><p>As the basis for several custom categories (see <a class="reference internal" href="custom_categories.html#creating-custom-categories"><span class="std std-ref">Creating Custom Categories</span></a>), e.g. a <strong>MusicGenre</strong> model</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">MusicGenre</span> <span class="mi">1</span>
+  <span class="n">MusicSubGenre</span> <span class="mi">1</span><span class="o">-</span><span class="mi">1</span>
+  <span class="n">MusicSubGenre</span> <span class="mi">1</span><span class="o">-</span><span class="mi">2</span>
+    <span class="n">MusicSubGenre</span> <span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span>
+<span class="n">MusicGenre</span> <span class="mi">2</span>
+  <span class="n">MusicSubGenre</span> <span class="mi">2</span><span class="o">-</span><span class="mi">1</span>
+</pre></div>
+</div>
+<p>and a <strong>Subject</strong> model</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Subject</span> <span class="mi">1</span>
+  <span class="n">Discipline</span> <span class="mi">1</span><span class="o">-</span><span class="mi">1</span>
+  <span class="n">Discipline</span> <span class="mi">1</span><span class="o">-</span><span class="mi">2</span>
+    <span class="n">SubDiscipline</span> <span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span>
+<span class="n">Subject</span> <span class="mi">2</span>
+  <span class="n">Discipline</span> <span class="mi">2</span><span class="o">-</span><span class="mi">1</span>
+</pre></div>
+</div>
+</li>
+</ol>
+<div class="section" id="connecting-your-model-with-django-categories">
+<h2>Connecting your model with Django-Categories<a class="headerlink" href="#connecting-your-model-with-django-categories" title="Permalink to this headline">¶</a></h2>
+<p>There are two ways to add Category fields to an application. If you are in control of the code (it’s your application) or you are willing to take control of the code (fork someone else’s app) you can make a <a class="reference internal" href="#hard-coded-connection"><span class="std std-ref">Hard Coded Connection</span></a>.</p>
+<p>For 3rd-party apps or even your own apps that you don’t wish to add Django-Categories as a dependency, you can configure a <a class="reference internal" href="#lazy-connection"><span class="std std-ref">Lazy Connection</span></a>.</p>
+<div class="section" id="hard-coded-connection">
+<span id="id1"></span><h3>Hard Coded Connection<a class="headerlink" href="#hard-coded-connection" title="Permalink to this headline">¶</a></h3>
+<p>Hard coded connections are done in the exact same way you handle any other foreign key or many-to-many relations to a model.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.db</span> <span class="kn">import</span> <span class="n">models</span>
+
+<span class="k">class</span> <span class="nc">MyModel</span><span class="p">(</span><span class="n">models</span><span class="o">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">category</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">ForeignKey</span><span class="p">(</span><span class="s1">&#39;categories.Category&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Don’t forget to add the field or fields to your <code class="docutils literal notranslate"><span class="pre">ModelAdmin</span></code> class as well.</p>
+</div>
+<div class="section" id="lazy-connection">
+<span id="id2"></span><h3>Lazy Connection<a class="headerlink" href="#lazy-connection" title="Permalink to this headline">¶</a></h3>
+<p>Lazy connections are done through configuring Django Categories in the project’s <code class="docutils literal notranslate"><span class="pre">settings.py</span></code> file. When the project starts up, the configured fields are dynamically added to the configured models and admin.</p>
+<p>If you do this before you have created the database (before you ran <code class="docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">syncdb</span></code>), the fields will also be in the tables. If you do this after you have already created all the tables, you can run <code class="docutils literal notranslate"><span class="pre">manage.py</span> <span class="pre">add_category_fields</span></code> to create the fields (this requires Django South to be installed).</p>
+<p>You add a many-to-one or many-to-many relationship with Django Categories using the <a class="reference internal" href="reference/settings.html#fk-registry"><span class="std std-ref">FK_REGISTRY</span></a> and <a class="reference internal" href="reference/settings.html#m2m-registry"><span class="std std-ref">M2M_REGISTRY</span></a> settings respectively. For more information see <a class="reference internal" href="registering_models.html#registering-models"><span class="std std-ref">Registering Models</span></a>.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Django Categories</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#connecting-your-model-with-django-categories">Connecting your model with Django-Categories</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Using categories in templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registering_models.html">Registering Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding_the_fields.html">Adding the fields to the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="admin_settings.html">Adding the fields to the Admin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom_categories.html">Creating Custom Categories</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="installation.html" title="previous chapter">Installation</a></li>
+      <li>Next: <a href="usage.html" title="next chapter">Using categories in templates</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2010-2012, Corey Oordt.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/getting_started.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

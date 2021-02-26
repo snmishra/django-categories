@@ -1,0 +1,386 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Creating Custom Categories &#8212; Django Categories 1.8 documentation</title>
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Reference" href="reference/index.html" />
+    <link rel="prev" title="Adding the fields to the Admin" href="admin_settings.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="creating-custom-categories">
+<span id="id1"></span><h1>Creating Custom Categories<a class="headerlink" href="#creating-custom-categories" title="Permalink to this headline">¶</a></h1>
+<p>Django Categories isn’t just for using a single category model. It allows you to create your own custom category-like models with as little or much customization as you need.</p>
+<div class="section" id="name-only">
+<h2>Name only<a class="headerlink" href="#name-only" title="Permalink to this headline">¶</a></h2>
+<p>For many cases, you want a simple user-managed lookup table. You can do this with just a little bit of code. The resulting model will include name, slug and active fields and a hierarchical admin.</p>
+<ol class="arabic">
+<li><p>Create a model that subclasses <a class="reference internal" href="reference/models.html#CategoryBase" title="CategoryBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">CategoryBase</span></code></a></p>
+<div class="highlight-default notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">categories.models</span> <span class="kn">import</span> <span class="n">CategoryBase</span>
+
+
+<span class="k">class</span> <span class="nc">SimpleCategory</span><span class="p">(</span><span class="n">CategoryBase</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple of catgorizing example</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="s1">&#39;simple categories&#39;</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p>Create a subclass of CategoryBaseAdmin.</p>
+<div class="highlight-default notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">admin</span>
+
+<span class="kn">from</span> <span class="nn">categories.admin</span> <span class="kn">import</span> <span class="n">CategoryBaseAdmin</span>
+
+<span class="kn">from</span> <span class="nn">.models</span> <span class="kn">import</span> <span class="n">SimpleCategory</span>
+
+
+<span class="k">class</span> <span class="nc">SimpleCategoryAdmin</span><span class="p">(</span><span class="n">CategoryBaseAdmin</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="n">admin</span><span class="o">.</span><span class="n">site</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">SimpleCategory</span><span class="p">,</span> <span class="n">SimpleCategoryAdmin</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p>Register your model and custom model admin class.</p></li>
+</ol>
+</div>
+<div class="section" id="name-and-other-data">
+<h2>Name and other data<a class="headerlink" href="#name-and-other-data" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes you need more functionality, such as extra metadata and custom functions. The <a class="reference internal" href="reference/models.html#Category" title="Category"><code class="xref py py-class docutils literal notranslate"><span class="pre">Category</span></code></a> model in this package does this.</p>
+<ol class="arabic">
+<li><p>Create a model that subclasses <a class="reference internal" href="reference/models.html#CategoryBase" title="CategoryBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">CategoryBase</span></code></a> as above.</p></li>
+<li><p>Add new fields to the model. The <a class="reference internal" href="reference/models.html#Category" title="Category"><code class="xref py py-class docutils literal notranslate"><span class="pre">Category</span></code></a> model adds these extra fields.</p>
+<div class="highlight-default notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span>
+<span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">categories</span> <span class="kn">import</span> <span class="n">models</span><span class="p">,</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">categories.base</span> <span class="kn">import</span> <span class="n">CategoryBase</span>
+
+
+<span class="k">class</span> <span class="nc">Category</span><span class="p">(</span><span class="n">CategoryBase</span><span class="p">):</span>
+    <span class="n">thumbnail</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">FileField</span><span class="p">(</span>
+        <span class="n">upload_to</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">THUMBNAIL_UPLOAD_PATH</span><span class="p">,</span>
+        <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">storage</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">THUMBNAIL_STORAGE</span><span class="p">,)</span>
+    <span class="n">thumbnail_width</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">thumbnail_height</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">IntegerField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">alternate_title</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;An alternative title to use on pages with this category.&quot;</span><span class="p">)</span>
+    <span class="n">alternate_url</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;An alternative URL to use instead of the one derived from &quot;</span>
+                  <span class="s2">&quot;the category hierarchy.&quot;</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span><span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">null</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">meta_keywords</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">max_length</span><span class="o">=</span><span class="mi">255</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;Comma-separated keywords for search engines.&quot;</span><span class="p">)</span>
+    <span class="n">meta_extra</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">TextField</span><span class="p">(</span>
+        <span class="n">blank</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">help_text</span><span class="o">=</span><span class="s2">&quot;(Advanced) Any additional HTML to be placed verbatim &quot;</span>
+                  <span class="s2">&quot;in the &amp;lt;head&amp;gt;&quot;</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p>Add new methods to the model. For example, the <a class="reference internal" href="reference/models.html#Category" title="Category"><code class="xref py py-class docutils literal notranslate"><span class="pre">Category</span></code></a> model adds several new methods, including overriding the <code class="xref py py-meth docutils literal notranslate"><span class="pre">save()</span></code> method.</p>
+<div class="highlight-default notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">categories.models</span> <span class="kn">import</span> <span class="n">Category</span>
+
+
+<span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">thumbnail</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">django.core.files.images</span> <span class="kn">import</span> <span class="n">get_image_dimensions</span>
+        <span class="kn">import</span> <span class="nn">django</span>
+        <span class="k">if</span> <span class="n">django</span><span class="o">.</span><span class="n">VERSION</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">get_image_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thumbnail</span><span class="o">.</span><span class="n">file</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">get_image_dimensions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thumbnail</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">thumbnail_width</span> <span class="o">=</span> <span class="n">width</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">thumbnail_height</span> <span class="o">=</span> <span class="n">height</span>
+
+    <span class="nb">super</span><span class="p">(</span><span class="n">Category</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p>Alter <code class="xref py py-class docutils literal notranslate"><span class="pre">Meta</span></code> or <code class="xref py py-class docutils literal notranslate"><span class="pre">MPTTMeta</span></code> class. Either of these inner classes can be overridden, however your <code class="xref py py-class docutils literal notranslate"><span class="pre">Meta</span></code> class should inherit <code class="xref py py-class docutils literal notranslate"><span class="pre">CategoryBase.Meta</span></code>. Options for <code class="xref py py-class docutils literal notranslate"><span class="pre">Meta</span></code> are in the <a class="reference external" href="http://readthedocs.org/docs/django-mptt/en/latest/models.html#model-options">Django-MPTT docs</a>.</p>
+<div class="highlight-default notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">categories.base</span> <span class="kn">import</span> <span class="n">CategoryBase</span>
+
+
+<span class="k">class</span> <span class="nc">Meta</span><span class="p">(</span><span class="n">CategoryBase</span><span class="o">.</span><span class="n">Meta</span><span class="p">):</span>
+    <span class="n">verbose_name_plural</span> <span class="o">=</span> <span class="s1">&#39;categories&#39;</span>
+
+
+<span class="k">class</span> <span class="nc">MPTTMeta</span><span class="p">:</span>
+    <span class="n">order_insertion_by</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p>For the admin, you must create a form that subclasses <code class="xref py py-class docutils literal notranslate"><span class="pre">CategoryBaseAdminForm</span></code> and at least sets the <code class="docutils literal notranslate"><span class="pre">Meta.model</span></code> attribute. You can also alter the form fields and cleaning methods, as <a class="reference internal" href="reference/models.html#Category" title="Category"><code class="xref py py-class docutils literal notranslate"><span class="pre">Category</span></code></a> does.</p>
+<div class="highlight-default notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">categories.base</span> <span class="kn">import</span> <span class="n">CategoryBaseAdminForm</span>
+<span class="kn">from</span> <span class="nn">categories.models</span> <span class="kn">import</span> <span class="n">Category</span>
+
+
+<span class="k">class</span> <span class="nc">CategoryAdminForm</span><span class="p">(</span><span class="n">CategoryBaseAdminForm</span><span class="p">):</span>
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Category</span>
+
+    <span class="k">def</span> <span class="nf">clean_alternate_title</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instance</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;alternate_title&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span><span class="p">[</span><span class="s1">&#39;alternate_title&#39;</span><span class="p">]</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+<li><p>Next you must subclass <code class="xref py py-class docutils literal notranslate"><span class="pre">CategoryBaseAdmin</span></code> and assign the <code class="docutils literal notranslate"><span class="pre">form</span></code> attribute the form class created above. You can alter any other attributes as necessary.</p>
+<div class="highlight-default notranslate"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span>
+<span class="normal">20</span>
+<span class="normal">21</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">categories.admin</span> <span class="kn">import</span> <span class="n">CategoryAdminForm</span>
+<span class="kn">from</span> <span class="nn">categories.base</span> <span class="kn">import</span> <span class="n">CategoryBaseAdmin</span>
+
+
+<span class="k">class</span> <span class="nc">CategoryAdmin</span><span class="p">(</span><span class="n">CategoryBaseAdmin</span><span class="p">):</span>
+    <span class="n">form</span> <span class="o">=</span> <span class="n">CategoryAdminForm</span>
+    <span class="n">list_display</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;alternate_title&#39;</span><span class="p">,</span> <span class="s1">&#39;active&#39;</span><span class="p">)</span>
+    <span class="n">fieldsets</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s1">&#39;fields&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;parent&#39;</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;thumbnail&#39;</span><span class="p">,</span> <span class="s1">&#39;active&#39;</span><span class="p">)</span>
+        <span class="p">}),</span>
+        <span class="p">(</span><span class="s1">&#39;Meta Data&#39;</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s1">&#39;fields&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;alternate_title&#39;</span><span class="p">,</span> <span class="s1">&#39;alternate_url&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">,</span>
+                       <span class="s1">&#39;meta_keywords&#39;</span><span class="p">,</span> <span class="s1">&#39;meta_extra&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;classes&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;collapse&#39;</span><span class="p">,),</span>
+        <span class="p">}),</span>
+        <span class="p">(</span><span class="s1">&#39;Advanced&#39;</span><span class="p">,</span> <span class="p">{</span>
+            <span class="s1">&#39;fields&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;order&#39;</span><span class="p">,</span> <span class="s1">&#39;slug&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;classes&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;collapse&#39;</span><span class="p">,),</span>
+        <span class="p">}),</span>
+    <span class="p">)</span>
+</pre></div>
+</td></tr></table></div>
+</li>
+</ol>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Django Categories</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Using categories in templates</a></li>
+<li class="toctree-l1"><a class="reference internal" href="registering_models.html">Registering Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="adding_the_fields.html">Adding the fields to the database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="admin_settings.html">Adding the fields to the Admin</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Creating Custom Categories</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#name-only">Name only</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#name-and-other-data">Name and other data</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">Reference</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="admin_settings.html" title="previous chapter">Adding the fields to the Admin</a></li>
+      <li>Next: <a href="reference/index.html" title="next chapter">Reference</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2010-2012, Corey Oordt.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/custom_categories.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
